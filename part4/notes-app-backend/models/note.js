@@ -1,12 +1,20 @@
 const mongoose = require('mongoose')
 
 const noteSchema = new mongoose.Schema({
+
   content: {
     type: String,
     minLength: 5,
     required: true
   },
-  important: Boolean
+
+  important: Boolean,
+
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
+  
 })
 
 // "toJSON" helps to converts special MONGO_db _id objectID into normal json fromat

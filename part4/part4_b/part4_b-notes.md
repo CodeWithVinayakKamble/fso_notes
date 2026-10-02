@@ -246,6 +246,7 @@ Think back to Part 3 when we inspected response headers! What extra text does Ex
     * **npm run test -- --test-name-pattern="notes"**
         - The **provided argument can refer** to the **name of the test** or the **describe block**. It **can also contain just a part of the name**. The following command will **run all** of the tests **that contain notes in their name**:
 
+    * **npx cross-env NODE_ENV=test node index.js** - to run test server
 ---
 
 ## async/await
@@ -341,10 +342,6 @@ beforeEach(async () => {
 
 * (Alternative bonus tip: You can also use a standard for...of loop with await, or await Note.insertMany(initialNotes)—both are also great!).
 
-
----
-
-* npx cross-env NODE_ENV=test node index.js
 
 ---
 

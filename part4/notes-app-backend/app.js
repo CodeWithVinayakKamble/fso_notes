@@ -8,6 +8,7 @@ const config = require('./utils/config')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
 const notesRouter = require('./controllers/notes').notesRouter
+const userRouter = require('./controllers/users').userRouter
 // ================================== //
 // App Initialization
 // ================================== //
@@ -32,7 +33,8 @@ app.use(express.json())
 
 app.use(middleware.requestLogger)   // 1. Log the incoming request FIRST
 
-app.use('/api/notes', notesRouter)  // 2. Then handle the route!
+app.use('/api/users', userRouter)   // 2. Users
+app.use('/api/notes', notesRouter)  // 2. Notes
 
 app.use(middleware.unknownEndpoint) // 3. Fallback for unmatched URLs
 

@@ -1,42 +1,19 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
-
+const User = require('../models/user')
 
 // ================================== //
 // Route Handlers
 // ================================== //
 
-
-
 // ============================================== //
 
-
-// notesRouter.get('/', (request, response) => {
-//   Note.find({})
-//     .then(notes => {
-//       response.json(notes)
-//     })
-// })
-
 notesRouter.get('/', async (request, response) => {
-  const notes = await Note.find({})
+  const notes = await Note.find({}).populate('user', { username: 1, name: 1 })
   response.json(notes)
 })
 
 // ============================================== //
-
-// notesRouter.get('/:id', (request, response, next) => {
-//   const id = request.params.id
-//   Note.findById(id)
-//     .then(note => {
-//       if (note) {
-//         response.json(note)
-//       } else {
-//         response.status(404).end()
-//       }
-//     })
-//     .catch(error => next(error))
-// })
 
 notesRouter.get('/:id', async (request, response) => {
 
@@ -53,30 +30,15 @@ notesRouter.get('/:id', async (request, response) => {
 
 // ============================================== //
 
-
-// notesRouter.post('/', (request, response, next) => {
-//   const body = request.body
-
-//   if (!body.content) {
-//     return response.status(400).json({ error: 'content missing' })
-//   };
-
-//   const note = new Note({
-//     content: body.content,
-//     important: body.important || false
-//   })
-
-//   note.save()
-//     .then(savedNote => {
-//       response.json(savedNote)
-//     })
-//     .catch(error => next(error))
-// })
-
 notesRouter.post('/', async (request, response) => {
 
-
   const body = request.body
+
+  const user = await User.findById(body.userId)
+
+  if (!user) {
+    return response.status(400).json({ error: 'userId missing or not valid' })
+  }
 
   if (!body.content) {
     return response.status(400).json({ error: 'content missing' })
@@ -84,28 +46,18 @@ notesRouter.post('/', async (request, response) => {
 
   const newNote = new Note({
     content: body.content,
-    important: body.important || false
+    important: body.important || false,
+    user: user._id
   })
 
   const savedNote = await newNote.save()
+  user.notes = user.notes.concat(savedNote._id)
+  await user.save()
   response.status(201).json(savedNote)
 })
 
 
 // ============================================== //
-
-// notesRouter.delete('/:id', (request, response, next) => {
-
-//   const id = request.params.id
-
-//   Note.findByIdAndDelete(id)
-//     .then(() => {
-//       response.status(204).end()
-//     })
-//     .catch(error => next(error))
-
-
-// })
 
 // Because 204 No Content sends no body (.end()), you don't even need to save the result into a variable deleteId! 
 notesRouter.delete('/:id', async (request, response) => {
@@ -116,23 +68,6 @@ notesRouter.delete('/:id', async (request, response) => {
 })
 
 // ============================================== //
-
-// notesRouter.put('/:id', (request, response, next) => {
-//   const id = request.params.id
-//   const { content, important } = request.body
-
-//   const note = {
-//     content: content,
-//     important: important
-//   }
-
-//   Note.findByIdAndUpdate(id, note, { returnDocument: 'after', runValidators: true, context: 'query' })
-//     // {new:"true"} is depreciated , Use `returnDocument: 'after'` instead Mongoose still supports { new: true } for backward compatibility
-//     .then(updatedNote => {
-//       response.json(updatedNote)
-//     })
-//     .catch(error => next(error))
-// })
 
 notesRouter.put('/:id', async (request, response) => {
 
