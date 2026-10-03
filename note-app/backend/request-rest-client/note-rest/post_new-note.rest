@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOiI2YWMwY2JmNzgwYzc4ZWZjNTAyYzVjNjIiLCJpYXQiOjE3OTEwMjAyNzN9.1n8q-vqS2gkvmovhZFSvG77nOtQXl5Ebi6IYMNQLDfA
+
+{
+    "content":"another test note for same user admin",
+    "important":false,
+    "userId":"6ac0cbf780c78efc502c5c62"
+}
