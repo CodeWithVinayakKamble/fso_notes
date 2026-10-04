@@ -7,7 +7,7 @@
 * It is never wise to store unencrypted plain text passwords in the database!
     - never ever save users password as it is plainText into db for security reasons user hashing techniques and save hashword into db
 
-* Pacakge called bcrypt
+* Pacakge called bcrypt / bcryptjs
 
 * Let's define a separate router for dealing with users in a new controllers/users.js file
 
