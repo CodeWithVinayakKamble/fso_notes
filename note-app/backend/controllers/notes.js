@@ -1,13 +1,11 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const { userExtractor } = require('../utils/middleware')
+
 
 // ================================== //
-// Route Handlers
+// HTTP GET Router
 // ================================== //
-
-// ============================================== //
 
 notesRouter.get('/', async (request, response) => {
   const notes = await Note.find({}).populate('user', { username: 1, name: 1 })
@@ -29,33 +27,14 @@ notesRouter.get('/:id', async (request, response) => {
 
 })
 
-// ============================================== //
-
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
-
-
-notesRouter.post('/', async (request, response) => {
+// ================================== //
+// HTTP POST Router
+// ================================== //
+notesRouter.post('/', userExtractor, async (request, response) => {
 
   const body = request.body
 
-  // The helper function getTokenFrom isolates the token from the authorization header.The validity of the token is checked with jwt.verify.The method also decodes the token, or returns the Object which the token was based on.
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-
-
-  // The object decoded from the token contains the username and id fields, which tell the server who made the request.
-
-  // If the object decoded from the token does not contain the user's identity (decodedToken.id is undefined), error status code 401 unauthorized is returned and the reason for the failure is explained in the response body.
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "Invalid Token" })
-  }
-
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   if (!user) {
     return response.status(400).json({ error: 'userId missing or not valid' })
@@ -78,21 +57,47 @@ notesRouter.post('/', async (request, response) => {
 })
 
 
-// ============================================== //
 
+// ================================== //
+// HTTP POST Router
+// ================================== //
 // Because 204 No Content sends no body (.end()), you don't even need to save the result into a variable deleteId! 
-notesRouter.delete('/:id', async (request, response) => {
-  const id = request.params.id
-  await Note.findByIdAndDelete(id)
+notesRouter.delete('/:id', userExtractor, async (request, response) => {
+
+  const user = request.user
+
+  const noteId = request.params.id
+  const note = await Note.findById(noteId)
+
+  if (!note) {
+    return response.status(404).json({ error: "Note not found" })
+  }
+
+  if (!note.user || user._id.toString() !== note.user.toString()) {
+    return response.status(403).json({ error: "only the creator can delete a note" })
+  }
+
+  await Note.findByIdAndDelete(noteId)
   response.status(204).end()
 
 })
 
 // ============================================== //
 
-notesRouter.put('/:id', async (request, response) => {
+notesRouter.put('/:id', userExtractor, async (request, response) => {
 
-  const id = request.params.id
+  const user = request.user
+  const noteId = request.params.id
+  const note = await Note.findById(noteId)
+
+  if (!note) {
+    return response.status(404).json({ error: "Note not found" })
+  }
+
+  if (!note.user || user._id.toString() !== note.user.toString()) {
+    return response.status(403).json({ error: "only the creator can modify the note" })
+  }
+
   const { content, important } = request.body
 
   const oldNoteWithUpdatedContent = {
@@ -101,11 +106,11 @@ notesRouter.put('/:id', async (request, response) => {
   }
 
   // {new:"true"} is depreciated , Use `returnDocument: 'after'` instead Mongoose still supports { new: true } for backward compatibility
-  const updatedNote = await Note.findByIdAndUpdate(id, oldNoteWithUpdatedContent, { returnDocument: 'after', runValidators: true, context: 'query' })
+  const updatedNote = await Note.findByIdAndUpdate(noteId, oldNoteWithUpdatedContent, { returnDocument: 'after', runValidators: true, context: 'query' })
 
   response.json(updatedNote)
 
 
 })
 
-module.exports = { notesRouter }
+module.exports = notesRouter

@@ -29,4 +29,4 @@ userRouter.post("/", async (request, response) => {
 
 
 
-module.exports = { userRouter }
+module.exports = userRouter

@@ -6,10 +6,11 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
-const middleware = require('./utils/middleware')
-const notesRouter = require('./controllers/notes').notesRouter
-const userRouter = require('./controllers/users').userRouter
-const loginRouter = require('./controllers/login').loginRouter
+const { requestLogger, tokenExtractor, unknownEndpoint, errorHandler } = require('./utils/middleware')
+const notesRouter = require('./controllers/notes')
+const userRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
+
 // ================================== //
 // App Initialization
 // ================================== //
@@ -29,18 +30,18 @@ mongoose.connect(config.MONGODB_URI)
 // ================================== //
 // Pre-Route Middlewares
 // ================================== //
-app.use(cors())
-app.use(express.json())
 
-app.use(middleware.requestLogger)   // 1. Log the incoming request FIRST
+app.use(cors())                     // Enable Cross-origin resourse sharing
+app.use(express.json())             // It parses incoming raw text (strings) from the network into a JavaScript Object on request.body
 
-app.use('/api/login', loginRouter)  // 1.login
-app.use('/api/users', userRouter)   // 2. Users
-app.use('/api/notes', notesRouter)  // 2. Notes
+app.use(requestLogger)              // Log the incoming request FIRST
+app.use('/api/users', userRouter)   // User Registration
+app.use('/api/login', loginRouter)  // User Authentication for JWT token
+app.use(tokenExtractor)             // Json-Web-Token_Extractor
+app.use('/api/notes', notesRouter)  // Notes App
 
-app.use(middleware.unknownEndpoint) // 2. Fallback for unmatched URLs
-
-app.use(middleware.errorHandler)    // 3. Centralized error handling
+app.use(unknownEndpoint)            // Fallback for unmatched URLs
+app.use(errorHandler)               // Centralized error handling system
 
 module.exports = app
 
