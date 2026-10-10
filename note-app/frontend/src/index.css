@@ -24,3 +24,9 @@ button {
     padding: 10px;
     margin-bottom: 10px;
 }
+
+.title {
+    color: green;
+    font-style: italic;
+    font-size: 2.5rem;
+}
