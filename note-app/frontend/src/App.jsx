@@ -1,3 +1,6 @@
+// ===================================== //
+// Imports
+// ===================================== //
 import { useEffect, useState } from "react";
 import noteServices from './services/notes.js'
 import Note from './components/Note.jsx'
@@ -8,23 +11,29 @@ import loginServices from "./services/login.js";
 
 const App = () => {
 
+    // ===================================== //
     // React States
+    // ===================================== //
     const [notes, setNotes] = useState([]);
     const [newNote, setNewNote] = useState('a new note...');
     const [showAll, setShowAll] = useState(true);
-    const [errorMessage, setErrorMessage] = useState(null)
+    const [notification, setNotification] = useState(null)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
 
-    // Fetching data from fake JSON-Server
+    // ===================================== //
+    // Fetching allNotes from server/backend
+    // ===================================== //
     useEffect(() => {
         noteServices
             .getAll()
-            .then(defaultData => setNotes(defaultData))
+            .then(getAllNotes => setNotes(getAllNotes))
     }, []);
 
-    // Fetching token from loaclStorage
+    // ===================================== //
+    // Fetching user and its Token from localStorage
+    // ===================================== //
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
         if (loggedUserJSON) {
@@ -34,64 +43,75 @@ const App = () => {
         }
     }, [])
 
-    // logic of toggle imp or !imp by axios.put() method
-    const toggleImportanceOf = (id) => {
+    // ===================================== //
+    // Http update(put) Request
+    // ===================================== //
+    const toggleImportanceOf = async (id) => {
         const note = notes.find(n => n.id === id);
         const changedNote = { ...note, important: !note.important };
 
-        noteServices
-            .update(id, changedNote)
-            .then(updatedNote => setNotes(notes.map(note => note.id === id ? updatedNote : note)))
-            .catch(error => {
-                setErrorMessage(`Note '${note.content}' was already removed from server`)
-                setTimeout(() => { setErrorMessage(null) }, 5000);
-
-                // It removed the ghost item from React's state using .filter() so the screen synced back with reality!
-                setNotes(notes.filter(n => n.id !== id))
-            })
-
+        try {
+            const updatedNote = await noteServices.update(id, changedNote)
+            setNotes(notes.map(note => note.id === id ? updatedNote : note))
+            setNotification({ message: 'importance toggled', type: 'success' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        } catch (error) {
+            setNotification({ message: `${error.response.data.error}`, type: 'error' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        }
     };
 
+    // ===================================== //
+    // Http post Request to adding note to server/db
+    // ===================================== //
+    const addNote = async (event) => {
+        event.preventDefault()
 
-    // Logic for adding notes to the server
-    const addNote = (event) => {
-        event.preventDefault();
+        try {
+            const newObject = {
+                content: newNote,
+                important: Math.random() < 0.5
+            }
 
-        const newObject = {
-            content: newNote,
-            important: Math.random() < 0.5
-        };
-
-        // Adding Note to the server (fake-db) and to the local-machine via axios.POST() Method
-        noteServices
-            .create(newObject)
-            .then(addedNote => {
-                setNotes([...notes, addedNote]);
-                setNewNote('')
-            })
+            const savedNote = await noteServices.create(newObject)
+            setNotes([...notes, savedNote])
+            setNewNote('')
+            setNotification({ message: `${savedNote.content} created successfully`, type: 'success' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        } catch (error) {
+            setNotification({ message: `${error.response.data.error}`, type: 'error' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        }
     };
 
-    // Logic for delete notes from server
-    const deleteNoteOf = (id) => {
-        let confirmation = window.confirm('Delete Note ?')
-        if (confirmation) {
-            noteServices
-                .remove(id)
-                .then(response => {
-                    setNotes(notes.filter(n => n.id !== id))
-                })
+    // ===================================== //
+    // Http Delete Request
+    // ===================================== //
+    const deleteNoteOf = async (id) => {
+        try {
+            const confirmation = window.confirm('Delete Note ?')
+            if (confirmation) {
+                await noteServices.remove(id)
+                setNotes(notes.filter(note => note.id !== id))
+                setNotification({ message: 'Note Deleted', type: 'success' })
+                setTimeout(() => { setNotification(null) }, 3000)
+            }
+        } catch (error) {
+            setNotification({ message: `${error.response.data.error}`, type: 'error' })
+            setTimeout(() => { setNotification(null) }, 3000)
+
         }
     }
 
-    // HTML Input Locked into React State
-    const handleNoteChange = (event) => {
-        setNewNote(event.target.value);
-    };
-
+    // ================================== //
     // ==== Filteration on Importance === //
-    // Logic - (Firstly its matching notes with showAll is true its finding true notes if did not got else block comes on game for filteration)
+    // ================================== //
     const notesToShow = showAll ? notes : notes.filter(note => note.important === true);
 
+
+    // ================================== //
+    // Login
+    // ================================== //
     const handleLogin = async (event) => {
         event.preventDefault()
         console.log('Logged in with username : ', username)
@@ -100,45 +120,54 @@ const App = () => {
             window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
             noteServices.setToken(user.token)
             setUser(user)
+            setNotification({ message: `${username} Logged in successfully`, type: 'success' })
+            setTimeout(() => { setNotification(null) }, 3000);
             setUsername('')
             setPassword('')
         } catch (error) {
-            setErrorMessage('Wrong Credentials')
-            setTimeout(() => { setErrorMessage(null) }, 3000)
+            setNotification({ message: 'Wrong Credentials', type: 'error' })
+            setTimeout(() => { setNotification(null) }, 3000)
         }
     }
 
     const handleLogOut = () => {
         setUser(null)
         window.localStorage.removeItem('loggedNoteappUser')
+        noteServices.setToken(null)
+        setNotification({ message: `${user.username} Logged out successfully`, type: 'success' })
+        setTimeout(() => { setNotification(null) }, 3000);
     }
 
     const loginForm = () => (
-        <form onSubmit={handleLogin}>
-            <div>
-                <label>
-                    Username :
-                    <input type="text"
-                        value={username}
-                        onChange={({ target }) => setUsername(target.value)} />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Password :
-                    <input type="text"
-                        value={password}
-                        onChange={({ target }) => setPassword(target.value)} />
-                </label>
-            </div>
+        <div>
+            <h2>Login</h2>
+            <form onSubmit={handleLogin}>
+                <div>
+                    <label>
+                        Username :
+                        <input type="text"
+                            value={username}
+                            onChange={({ target }) => setUsername(target.value)} />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Password :
+                        <input type="password"
+                            value={password}
+                            onChange={({ target }) => setPassword(target.value)} />
+                    </label>
+                </div>
 
-            <button type="submit" >Login</button>
-        </form>
+                <button type="submit" >Login</button>
+            </form>
+
+        </div>
     )
 
     const noteForm = () => (
         <form onSubmit={addNote}>
-            <input value={newNote} onChange={handleNoteChange} />
+            <input value={newNote} onChange={({ target }) => setNewNote(target.value)} />
             <button type="submit">Save</button>
         </form>
     )
@@ -146,13 +175,12 @@ const App = () => {
     return (
         <div>
             <h1 className="title">Notes app</h1>
-            <Notification message={errorMessage} />
-            <h2>Login</h2>
+            <Notification notification={notification} />
             {!user && loginForm()}
             {user && (
                 <div>
-                    <p>{user.name} logged in</p>
-                    <button type="button" onClick={() => handleLogOut()}>Log Out</button>
+                    <p>{user.name} logged in<button type="button" onClick={() => handleLogOut()}>Log Out</button>
+                    </p>
                     {noteForm()}
                 </div>
             )}
