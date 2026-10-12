@@ -7,6 +7,9 @@ import Note from './components/Note.jsx'
 import Notification from "./components/Notification.jsx";
 import Footer from "./components/Footer.jsx";
 import loginServices from "./services/login.js";
+import LoginForm from "./components/LoginForm.jsx";
+import Togglable from "./components/Togglable.jsx";
+import NoteForm from "./components/NoteForm.jsx";
 
 
 const App = () => {
@@ -15,7 +18,6 @@ const App = () => {
     // React States
     // ===================================== //
     const [notes, setNotes] = useState([]);
-    const [newNote, setNewNote] = useState('a new note...');
     const [showAll, setShowAll] = useState(true);
     const [notification, setNotification] = useState(null)
     const [username, setUsername] = useState('')
@@ -64,18 +66,11 @@ const App = () => {
     // ===================================== //
     // Http post Request to adding note to server/db
     // ===================================== //
-    const addNote = async (event) => {
-        event.preventDefault()
+    const addNote = async (newNoteObject) => {
 
         try {
-            const newObject = {
-                content: newNote,
-                important: Math.random() < 0.5
-            }
-
-            const savedNote = await noteServices.create(newObject)
+            const savedNote = await noteServices.create(newNoteObject)
             setNotes([...notes, savedNote])
-            setNewNote('')
             setNotification({ message: `${savedNote.content} created successfully`, type: 'success' })
             setTimeout(() => { setNotification(null) }, 3000)
         } catch (error) {
@@ -110,7 +105,7 @@ const App = () => {
 
 
     // ================================== //
-    // Login
+    // Login Logic
     // ================================== //
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -138,50 +133,30 @@ const App = () => {
         setTimeout(() => { setNotification(null) }, 3000);
     }
 
-    const loginForm = () => (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>
-                        Username :
-                        <input type="text"
-                            value={username}
-                            onChange={({ target }) => setUsername(target.value)} />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Password :
-                        <input type="password"
-                            value={password}
-                            onChange={({ target }) => setPassword(target.value)} />
-                    </label>
-                </div>
-
-                <button type="submit" >Login</button>
-            </form>
-
-        </div>
-    )
-
-    const noteForm = () => (
-        <form onSubmit={addNote}>
-            <input value={newNote} onChange={({ target }) => setNewNote(target.value)} />
-            <button type="submit">Save</button>
-        </form>
-    )
+    // ================================== //
+    // Login Form Visibility
+    // ================================== //
 
     return (
         <div>
             <h1 className="title">Notes app</h1>
             <Notification notification={notification} />
-            {!user && loginForm()}
+            {!user && (
+                <Togglable buttonLabel='Log in'>
+                    <LoginForm
+                        handleLogin={handleLogin}
+                        username={username}
+                        setUsername={setUsername}
+                        password={password}
+                        setPassword={setPassword} />
+                </Togglable>
+            )}
             {user && (
                 <div>
-                    <p>{user.name} logged in<button type="button" onClick={() => handleLogOut()}>Log Out</button>
-                    </p>
-                    {noteForm()}
+                    <p>{user.name} logged in<button type="button" onClick={handleLogOut}>Log Out</button></p>
+                    <Togglable buttonLabel="new Note">
+                        <NoteForm createNote={addNote} />
+                    </Togglable>
                 </div>
             )}
 
