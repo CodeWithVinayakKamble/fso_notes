@@ -1,7 +1,7 @@
 // ===================================== //
 // Imports
 // ===================================== //
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import noteServices from './services/notes.js'
 import Note from './components/Note.jsx'
 import Notification from "./components/Notification.jsx";
@@ -23,6 +23,10 @@ const App = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
+    const noteFormRef = useRef()
+    const togglable1 = useRef()
+    const togglable2 = useRef()
+    const togglable3 = useRef()
 
     // ===================================== //
     // Fetching allNotes from server/backend
@@ -69,6 +73,7 @@ const App = () => {
     const addNote = async (newNoteObject) => {
 
         try {
+            noteFormRef.current.toggleVisibility()
             const savedNote = await noteServices.create(newNoteObject)
             setNotes([...notes, savedNote])
             setNotification({ message: `${savedNote.content} created successfully`, type: 'success' })
@@ -105,7 +110,7 @@ const App = () => {
 
 
     // ================================== //
-    // Login Logic
+    // Login/Log-out Logic
     // ================================== //
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -133,10 +138,6 @@ const App = () => {
         setTimeout(() => { setNotification(null) }, 3000);
     }
 
-    // ================================== //
-    // Login Form Visibility
-    // ================================== //
-
     return (
         <div>
             <h1 className="title">Notes app</h1>
@@ -154,7 +155,7 @@ const App = () => {
             {user && (
                 <div>
                     <p>{user.name} logged in<button type="button" onClick={handleLogOut}>Log Out</button></p>
-                    <Togglable buttonLabel="new Note">
+                    <Togglable buttonLabel="new Note" ref={noteFormRef}>
                         <NoteForm createNote={addNote} />
                     </Togglable>
                 </div>

@@ -78,3 +78,39 @@ const Box = (props) => {
 
   * Child (NoteForm) calls that function and puts the data inside the parentheses 
   **(createNote({ content: newNote, ... }))**.
+
+---
+
+## useRef hook
+
+* The **`useRef hook`** is used to create a **noteFormRef** reference, that is assigned to the Togglable component containing the creation note form. 
+
+* The noteFormRef variable acts as a reference to the component. This hook ensures that the same reference (ref) is kept throughout re-renders of the component.
+
+### The component uses the useImperativeHandle hook to make its toggleVisibility function available outside of the component.
+
+* We can now hide the form by calling noteFormRef.current.toggleVisibility() after a new note has been created:
+
+  - we have call the **noteFormRef.current.toggleVisibility()** this refrence function into function of addnote
+
+* To recap, the useImperativeHandle function is a React hook, that is used for defining functions in a component, which can be invoked from outside of the component.
+
+* Togglable already has its own internal function:
+  
+```js
+const toggleVisibility = () => setVisible(!visible)
+```
+  
+* By default, that function is locked inside Togglable.
+
+* useImperativeHandle simply makes a copy of that function available to the outside world:
+
+* **The Problem**: visible state lives inside Togglable. Normally, React data only flows downwards. App.jsx has no way to reach inside Togglable and flip visible back to false!
+
+* **The Solution** (useImperativeHandle + useRef): Think of ref like giving App.jsx a remote control to Togglable:
+
+* useImperativeHandle inside Togglable says: "Hey React, expose this one function (toggleVisibility) on my remote control."
+
+* useRef in App.jsx holds that remote control: const noteFormRef = useRef().
+
+* Now, right after App.jsx finishes saving the note, App.jsx can press the remote button from outside:
