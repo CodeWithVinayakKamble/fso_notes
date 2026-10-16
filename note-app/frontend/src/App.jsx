@@ -2,7 +2,7 @@
 // Imports
 // ===================================== //
 import { useEffect, useState, useRef } from "react";
-import noteServices from './services/notes.js'
+import noteServices from './services/note.js'
 import Note from './components/Note.jsx'
 import Notification from "./components/Notification.jsx";
 import Footer from "./components/Footer.jsx";
@@ -10,6 +10,9 @@ import loginServices from "./services/login.js";
 import LoginForm from "./components/LoginForm.jsx";
 import Togglable from "./components/Togglable.jsx";
 import NoteForm from "./components/NoteForm.jsx";
+import UserRegistration from "./components/UserRegistration.jsx";
+import userServices from "./services/user.js"
+
 
 
 const App = () => {
@@ -24,9 +27,6 @@ const App = () => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const noteFormRef = useRef()
-    const togglable1 = useRef()
-    const togglable2 = useRef()
-    const togglable3 = useRef()
 
     // ===================================== //
     // Fetching allNotes from server/backend
@@ -58,7 +58,7 @@ const App = () => {
 
         try {
             const updatedNote = await noteServices.update(id, changedNote)
-            setNotes(notes.map(note => note.id === id ? updatedNote : note))
+            setNotes(notes.map(note => note.id === id ? { ...updatedNote, user: note.user } : note))
             setNotification({ message: 'importance toggled', type: 'success' })
             setTimeout(() => { setNotification(null) }, 3000)
         } catch (error) {
@@ -75,7 +75,7 @@ const App = () => {
         try {
             noteFormRef.current.toggleVisibility()
             const savedNote = await noteServices.create(newNoteObject)
-            setNotes([...notes, savedNote])
+            setNotes([...notes, { ...savedNote, user }])
             setNotification({ message: `${savedNote.content} created successfully`, type: 'success' })
             setTimeout(() => { setNotification(null) }, 3000)
         } catch (error) {
@@ -114,12 +114,12 @@ const App = () => {
     // ================================== //
     const handleLogin = async (event) => {
         event.preventDefault()
-        console.log('Logged in with username : ', username)
         try {
             const user = await loginServices.login({ username, password })
+            console.log('Logged in with username : ', username)
             window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
-            noteServices.setToken(user.token)
             setUser(user)
+            noteServices.setToken(user.token)
             setNotification({ message: `${username} Logged in successfully`, type: 'success' })
             setTimeout(() => { setNotification(null) }, 3000);
             setUsername('')
@@ -138,19 +138,42 @@ const App = () => {
         setTimeout(() => { setNotification(null) }, 3000);
     }
 
+    const handleRegistartion = async ({ username, name, password }) => {
+        try {
+            await userServices.create({ username, name, password })
+
+            const user = await loginServices.login({ username, password })
+            window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
+            noteServices.setToken(user.token)
+            setUser(user)
+            setNotification({ message: `Welcome ${user.name}`, type: 'success' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        } catch (error) {
+            setNotification({ message: `${error.response.data.error}`, type: 'error' })
+            setTimeout(() => { setNotification(null) }, 3000)
+        }
+    }
+
     return (
         <div>
             <h1 className="title">Notes app</h1>
             <Notification notification={notification} />
             {!user && (
-                <Togglable buttonLabel='Log in'>
-                    <LoginForm
-                        handleLogin={handleLogin}
-                        username={username}
-                        setUsername={setUsername}
-                        password={password}
-                        setPassword={setPassword} />
-                </Togglable>
+                <>
+                    <Togglable buttonLabel='Log in'>
+                        <LoginForm
+                            handleLogin={handleLogin}
+                            username={username}
+                            setUsername={setUsername}
+                            password={password}
+                            setPassword={setPassword} />
+                    </Togglable>
+
+                    <Togglable buttonLabel="Create new account">
+                        <UserRegistration newUser={handleRegistartion} />
+                    </Togglable>
+
+                </>
             )}
             {user && (
                 <div>
@@ -173,7 +196,7 @@ const App = () => {
                 {notesToShow.map(note => {
                     const { id } = note
                     return (
-                        <Note key={id} note={note} toggleImportance={() => toggleImportanceOf(id)} deleteNoteHandler={deleteNoteOf} />
+                        <Note key={id} note={note} activeUser={user} toggleImportance={() => toggleImportanceOf(id)} deleteNoteHandler={deleteNoteOf} />
                     )
                 })}
             </ul>

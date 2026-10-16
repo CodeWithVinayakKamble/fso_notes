@@ -53,13 +53,14 @@ notesRouter.post('/', userExtractor, async (request, response) => {
   const savedNote = await newNote.save()
   user.notes = user.notes.concat(savedNote._id)
   await user.save()
+  await savedNote.populate('user', { username: 1, name: 1 })
   response.status(201).json(savedNote)
 })
 
 
 
 // ================================== //
-// HTTP POST Router
+// HTTP Delete Router
 // ================================== //
 // Because 204 No Content sends no body (.end()), you don't even need to save the result into a variable deleteId! 
 notesRouter.delete('/:id', userExtractor, async (request, response) => {
@@ -77,7 +78,12 @@ notesRouter.delete('/:id', userExtractor, async (request, response) => {
     return response.status(403).json({ error: "only the creator can delete a note" })
   }
 
+  // 1. Delete the note document
   await Note.findByIdAndDelete(noteId)
+
+  // 2. Remove the note ID from the user's array and save!
+  user.notes = user.notes.filter(id => id.toString() !== noteId)
+  await user.save()
   response.status(204).end()
 
 })
@@ -108,6 +114,8 @@ notesRouter.put('/:id', userExtractor, async (request, response) => {
   // {new:"true"} is depreciated , Use `returnDocument: 'after'` instead Mongoose still supports { new: true } for backward compatibility
   const updatedNote = await Note.findByIdAndUpdate(noteId, oldNoteWithUpdatedContent, { returnDocument: 'after', runValidators: true, context: 'query' })
 
+  // if not done this will problem in ui
+  await updatedNote.populate('user', { username: 1, name: 1 })
   response.json(updatedNote)
 
 

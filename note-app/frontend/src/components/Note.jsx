@@ -1,4 +1,4 @@
-const Note = ({ note, toggleImportance, deleteNoteHandler }) => {
+const Note = ({ note, toggleImportance, deleteNoteHandler, activeUser }) => {
 
     const { content, important, id } = note
 
@@ -6,9 +6,13 @@ const Note = ({ note, toggleImportance, deleteNoteHandler }) => {
 
     return (
         <li className="note" >
-            {content}
-            <button onClick={toggleImportance}>{label}</button>
-            <button onClick={() => deleteNoteHandler(id)}>Delete</button>
+            {content} by ~ {note?.user?.username}
+            {note?.user?.username === activeUser?.username && (
+                <>
+                    <button onClick={toggleImportance}>{label}</button>
+                    <button onClick={() => deleteNoteHandler(id)}>Delete</button>
+                </>
+            )}
         </li>
     )
 };
