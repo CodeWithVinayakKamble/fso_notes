@@ -23,8 +23,6 @@ const App = () => {
     const [notes, setNotes] = useState([]);
     const [showAll, setShowAll] = useState(true);
     const [notification, setNotification] = useState(null)
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const noteFormRef = useRef()
 
@@ -112,8 +110,8 @@ const App = () => {
     // ================================== //
     // Login/Log-out Logic
     // ================================== //
-    const handleLogin = async (event) => {
-        event.preventDefault()
+    const handleLogin = async ({ username, password }) => {
+
         try {
             const user = await loginServices.login({ username, password })
             console.log('Logged in with username : ', username)
@@ -122,8 +120,6 @@ const App = () => {
             noteServices.setToken(user.token)
             setNotification({ message: `${username} Logged in successfully`, type: 'success' })
             setTimeout(() => { setNotification(null) }, 3000);
-            setUsername('')
-            setPassword('')
         } catch (error) {
             setNotification({ message: 'Wrong Credentials', type: 'error' })
             setTimeout(() => { setNotification(null) }, 3000)
@@ -162,11 +158,7 @@ const App = () => {
                 <>
                     <Togglable buttonLabel='Log in'>
                         <LoginForm
-                            handleLogin={handleLogin}
-                            username={username}
-                            setUsername={setUsername}
-                            password={password}
-                            setPassword={setPassword} />
+                            handleLogin={handleLogin} />
                     </Togglable>
 
                     <Togglable buttonLabel="Create new account">
