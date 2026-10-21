@@ -1,63 +1,63 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 const UserRegistration = ({ newUser }) => {
 
-    const [username, setUsername] = useState('')
-    const [name, setName] = useState('')
-    const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
 
-    const createUser = (event) => {
-        event.preventDefault()
+  const createUser = (event) => {
+    event.preventDefault()
 
-        newUser({ username, name, password })
+    newUser({ username, name, password })
 
-    }
+  }
 
-    return (
-        <>
-            <h2>User Registration</h2>
+  return (
+    <>
+      <h2>User Registration</h2>
 
-            <form onSubmit={createUser}>
+      <form onSubmit={createUser}>
 
-                <div>
-                    <label>
+        <div>
+          <label>
                         Username :
-                        <input type="text"
-                            value={username}
-                            onChange={({ target }) => setUsername(target.value)}
-                            required
-                        />
-                    </label>
-                </div>
+            <input type="text"
+              value={username}
+              onChange={({ target }) => setUsername(target.value)}
+              required
+            />
+          </label>
+        </div>
 
-                <div>
-                    <label>
+        <div>
+          <label>
                         Name :
-                        <input type="text"
-                            value={name}
-                            onChange={({ target }) => setName(target.value)}
-                            required
-                        />
-                    </label>
-                </div>
+            <input type="text"
+              value={name}
+              onChange={({ target }) => setName(target.value)}
+              required
+            />
+          </label>
+        </div>
 
-                <div>
-                    <label>
+        <div>
+          <label>
                         Password :
-                        <input type="password"
-                            value={password}
-                            onChange={({ target }) => setPassword(target.value)}
-                            required
-                        />
-                    </label>
-                </div>
+            <input type="password"
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
+              required
+            />
+          </label>
+        </div>
 
-                <button type="submit">Sign up</button>
+        <button type="submit">Sign up</button>
 
-            </form>
+      </form>
 
-        </>
-    )
+    </>
+  )
 }
 
 export default UserRegistration
