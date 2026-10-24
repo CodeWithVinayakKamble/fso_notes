@@ -156,12 +156,12 @@ const App = () => {
       <Notification notification={notification} />
       {!user && (
         <>
-          <Togglable buttonLabel='Log in'>
+          <Togglable buttonLabel='log in'>
             <LoginForm
               handleLogin={handleLogin} />
           </Togglable>
 
-          <Togglable buttonLabel="Create new account">
+          <Togglable buttonLabel="create new account">
             <UserRegistration newUser={handleRegistartion} />
           </Togglable>
 
@@ -169,8 +169,8 @@ const App = () => {
       )}
       {user && (
         <div>
-          <p>{user.name} logged in<button type="button" onClick={handleLogOut}>Log Out</button></p>
-          <Togglable buttonLabel="new Note" ref={noteFormRef}>
+          <p>{user.name} logged in<button type="button" onClick={handleLogOut}>log Out</button></p>
+          <Togglable buttonLabel="new note" ref={noteFormRef}>
             <NoteForm createNote={addNote} />
           </Togglable>
         </div>
@@ -180,7 +180,7 @@ const App = () => {
 
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          Show {showAll ? 'important' : 'all'}
+          show {showAll ? 'important' : 'all'}
         </button>
       </div>
 

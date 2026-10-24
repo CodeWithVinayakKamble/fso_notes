@@ -40,6 +40,11 @@ app.use('/api/login', loginRouter)  // User Authentication for JWT token
 app.use(tokenExtractor)             // Json-Web-Token_Extractor
 app.use('/api/notes', notesRouter)  // Notes App
 
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
+
 app.use(unknownEndpoint)            // Fallback for unmatched URLs
 app.use(errorHandler)               // Centralized error handling system
 

@@ -10,7 +10,7 @@ const Note = ({ note, toggleImportance, deleteNoteHandler, activeUser }) => {
       {note?.user?.username === activeUser?.username && (
         <>
           <button onClick={toggleImportance}>{label}</button>
-          <button onClick={() => deleteNoteHandler(id)}>Delete</button>
+          <button onClick={() => deleteNoteHandler(id)}>delete</button>
         </>
       )}
     </li>

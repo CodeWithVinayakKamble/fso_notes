@@ -29,7 +29,7 @@ const NoteForm = ({ createNote }) => {
           id='note-input'
         />
 
-        <button type="submit">Save</button>
+        <button type="submit">save</button>
 
       </form>
 

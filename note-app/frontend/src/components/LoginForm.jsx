@@ -21,7 +21,7 @@ const LoginForm = ({ handleLogin }) => {
       <form onSubmit={userValidator}>
         <div>
           <label>
-                        Username :
+            username
             <input type="text"
               value={username}
               onChange={({ target }) => setUsername(target.value)} />
@@ -29,14 +29,14 @@ const LoginForm = ({ handleLogin }) => {
         </div>
         <div>
           <label>
-                        Password :
+            password
             <input type="password"
               value={password}
               onChange={({ target }) => setPassword(target.value)} />
           </label>
         </div>
 
-        <button type="submit" >Login</button>
+        <button type="submit" >login</button>
       </form>
 
     </div>

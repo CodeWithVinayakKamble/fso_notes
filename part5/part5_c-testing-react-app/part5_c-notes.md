@@ -82,6 +82,18 @@ test('renders content', () => {
 * vite.config.js tells Vitest to run them.
 * eslint.config.js tells ESLint not to complain about them.
 
+## testSetup at root testSetup.js
+```js
+import { cleanup } from "@testing-library/react";
+import { afterEach } from "vitest";
+import '@testing-library/jest-dom/vitest'
+
+
+afterEach(() => {
+    cleanup()
+})
+```
+
 ### test files in src/components/... Note.test.jsx
 
 ## npm install --save-dev @testing-library/user-event
