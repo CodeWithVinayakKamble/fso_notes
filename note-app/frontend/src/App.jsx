@@ -1,17 +1,26 @@
 // ===================================== //
 // Imports
 // ===================================== //
-import { useEffect, useState, useRef } from 'react'
-import noteServices from './services/note.js'
-import Note from './components/Note.jsx'
+
+// ==== dependecies ==== //
+import { useEffect, useState } from 'react'
+import { Routes, Route, Link, useMatch, Navigate, useNavigate } from 'react-router-dom'
+
+// ==== Components ==== //
 import Notification from './components/Notification.jsx'
 import Footer from './components/Footer.jsx'
-import loginServices from './services/login.js'
-import LoginForm from './components/LoginForm.jsx'
-import Togglable from './components/Togglable.jsx'
 import NoteForm from './components/NoteForm.jsx'
+import Home from './components/Home.jsx'
+import NoteList from './components/NoteList.jsx'
+import Note from './components/Note.jsx'
 import UserRegistration from './components/UserRegistration.jsx'
+
+
+// ==== Services ==== //
+import noteServices from './services/note.js'
+import loginServices from './services/login.js'
 import userServices from './services/user.js'
+import LoginForm from './components/LoginForm.jsx'
 
 
 
@@ -20,11 +29,10 @@ const App = () => {
   // ===================================== //
   // React States
   // ===================================== //
-  const [notes, setNotes] = useState([])
-  const [showAll, setShowAll] = useState(true)
   const [notification, setNotification] = useState(null)
+  const [notes, setNotes] = useState([])
   const [user, setUser] = useState(null)
-  const noteFormRef = useRef()
+  const navigate = useNavigate()
 
   // ===================================== //
   // Fetching allNotes from server/backend
@@ -57,8 +65,6 @@ const App = () => {
     try {
       const updatedNote = await noteServices.update(id, changedNote)
       setNotes(notes.map(note => note.id === id ? { ...updatedNote, user: note.user } : note))
-      setNotification({ message: 'importance toggled', type: 'success' })
-      setTimeout(() => { setNotification(null) }, 3000)
     } catch (error) {
       setNotification({ message: `${error.response.data.error}`, type: 'error' })
       setTimeout(() => { setNotification(null) }, 3000)
@@ -71,9 +77,9 @@ const App = () => {
   const addNote = async (newNoteObject) => {
 
     try {
-      noteFormRef.current.toggleVisibility()
       const savedNote = await noteServices.create(newNoteObject)
       setNotes([...notes, { ...savedNote, user }])
+      navigate('/notes')
       setNotification({ message: `${savedNote.content} created successfully`, type: 'success' })
       setTimeout(() => { setNotification(null) }, 3000)
     } catch (error) {
@@ -87,13 +93,11 @@ const App = () => {
   // ===================================== //
   const deleteNoteOf = async (id) => {
     try {
-      const confirmation = window.confirm('Delete Note ?')
-      if (confirmation) {
-        await noteServices.remove(id)
-        setNotes(notes.filter(note => note.id !== id))
-        setNotification({ message: 'Note Deleted', type: 'success' })
-        setTimeout(() => { setNotification(null) }, 3000)
-      }
+      await noteServices.remove(id)
+      setNotes(notes.filter(note => note.id !== id))
+      setNotification({ message: 'Note Deleted', type: 'success' })
+      setTimeout(() => { setNotification(null) }, 3000)
+
     } catch (error) {
       setNotification({ message: `${error.response.data.error}`, type: 'error' })
       setTimeout(() => { setNotification(null) }, 3000)
@@ -101,10 +105,6 @@ const App = () => {
     }
   }
 
-  // ================================== //
-  // ==== Filteration on Importance === //
-  // ================================== //
-  const notesToShow = showAll ? notes : notes.filter(note => note.important === true)
 
 
   // ================================== //
@@ -118,6 +118,7 @@ const App = () => {
       window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       setUser(user)
       noteServices.setToken(user.token)
+      navigate('/notes')
       setNotification({ message: `${username} Logged in successfully`, type: 'success' })
       setTimeout(() => { setNotification(null) }, 3000)
     } catch (error) {
@@ -142,6 +143,7 @@ const App = () => {
       window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       noteServices.setToken(user.token)
       setUser(user)
+      navigate('/notes')
       setNotification({ message: `Welcome ${user.name}`, type: 'success' })
       setTimeout(() => { setNotification(null) }, 3000)
     } catch (error) {
@@ -150,48 +152,66 @@ const App = () => {
     }
   }
 
+  const match = useMatch(`/notes/:id`)
+  const note = match ? notes.find(note => note.id === match.params.id) : null
+
   return (
     <div>
-      <h1 className="title">Notes app</h1>
-      <Notification notification={notification} />
-      {!user && (
-        <>
-          <Togglable buttonLabel='log in'>
-            <LoginForm
-              handleLogin={handleLogin} />
-          </Togglable>
 
-          <Togglable buttonLabel="create new account">
-            <UserRegistration newUser={handleRegistartion} />
-          </Togglable>
+      <header className='header'>
 
-        </>
-      )}
-      {user && (
-        <div>
-          <p>{user.name} logged in<button type="button" onClick={handleLogOut}>log Out</button></p>
-          <Togglable buttonLabel="new note" ref={noteFormRef}>
-            <NoteForm createNote={addNote} />
-          </Togglable>
+        <nav className='navbar'>
+
+          <Link to='/'>home</Link>
+
+          <Link to='/notes'>notes</Link>
+
+          <Link to='/create'>new note</Link>
+
+        </nav>
+
+        <div>{!user ?
+          (<button type='button' onClick={() => navigate('/login')}>log in</button>)
+          :
+          (<div>{user?.username}<button type='button' onClick={handleLogOut}>log out</button></div>)
+        }
         </div>
-      )}
 
-      <br />
+      </header>
 
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all'}
-        </button>
-      </div>
+      <Notification notification={notification} />
 
-      <ul>
-        {notesToShow.map(note => {
-          const { id } = note
-          return (
-            <Note key={id} note={note} activeUser={user} toggleImportance={() => toggleImportanceOf(id)} deleteNoteHandler={deleteNoteOf} />
-          )
-        })}
-      </ul>
+
+      <Routes>
+
+        <Route path='/' element={<Home />} />
+
+        <Route path='/notes'
+          element={<NoteList
+            notes={notes}
+            user={user}
+          />
+          }
+        />
+
+        <Route path='/notes/:id'
+          element={
+            <Note
+              note={note}
+              activeUser={user}
+              toggleImportance={toggleImportanceOf}
+              deleteNoteHandler={deleteNoteOf}
+            />
+          }
+        />
+
+        <Route path='/login' element={user ? <Navigate replace to={'/notes'} /> : <LoginForm handleLogin={handleLogin} />} />
+
+        <Route path='/create' element={user ? <NoteForm createNote={addNote} /> : <Navigate replace to='/login' />} />
+
+        <Route path='/user' element={<UserRegistration newUser={handleRegistartion} />} />
+
+      </Routes>
 
       <Footer />
 

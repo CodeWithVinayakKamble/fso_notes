@@ -21,7 +21,7 @@ const UserRegistration = ({ newUser }) => {
 
         <div>
           <label>
-                        Username :
+            Username :
             <input type="text"
               value={username}
               onChange={({ target }) => setUsername(target.value)}
@@ -32,7 +32,7 @@ const UserRegistration = ({ newUser }) => {
 
         <div>
           <label>
-                        Name :
+            Name :
             <input type="text"
               value={name}
               onChange={({ target }) => setName(target.value)}
@@ -43,7 +43,7 @@ const UserRegistration = ({ newUser }) => {
 
         <div>
           <label>
-                        Password :
+            Password :
             <input type="password"
               value={password}
               onChange={({ target }) => setPassword(target.value)}

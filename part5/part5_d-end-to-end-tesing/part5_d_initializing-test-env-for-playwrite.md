@@ -31,10 +31,9 @@
 }
 ```
 
-4. configure in note-app's backend package.json scripts
-"start:test":"cross-env NODE_ENV=test node --watch index.js"
+4. configure backend controller/testing.js , package.json to test:db
 
-5. npm test -- --project chromium
+
 
 ## things to keep in mind
 
