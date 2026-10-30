@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button, Box, Typography } from '@mui/material'
 
 const LoginForm = ({ handleLogin }) => {
 
@@ -18,37 +19,44 @@ const LoginForm = ({ handleLogin }) => {
   }
 
   return (
-    <div>
-      <h2>Login</h2>
+    <Box sx={{ maxWidth: 400, margin: '40px auto' }}>
+      
+      <Typography variant="h4" component="h2" gutterBottom>
+        Login
+      </Typography>
 
       <form onSubmit={userValidator}>
-        <div>
-          <label>
-            username
-            <input type="text"
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            password
-            <input type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-              required
-            />
-          </label>
-        </div>
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            fullWidth
+            label="username"
+            value={username}
+            onChange={({ target }) => setUsername(target.value)}
+            required
+          />
+        </Box>
 
-        <button type="submit" >login</button>
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            fullWidth
+            type="password"
+            label="password"
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
+            required
+          />
+        </Box>
+
+        <Button fullWidth variant="contained" color="primary" type="submit" sx={{ mb: 1 }}>
+          login
+        </Button>
       </form>
 
-      <button type='button' onClick={() => navigate('/user')}>sign up</button>
+      <Button fullWidth variant="text" onClick={() => navigate('/user')}>
+        Don't have an account? Sign up
+      </Button>
 
-    </div>
+    </Box>
   )
 }
 

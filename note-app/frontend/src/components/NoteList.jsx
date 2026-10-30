@@ -1,42 +1,43 @@
 // ==== dependecies ==== //
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 
-const NoteList = ({ notes, user, }) => {
-
-    const [showAll, setShowAll] = useState(true)
-    const navigate = useNavigate()
-
-    // ================================== //
-    // ==== Filteration on Importance === //
-    // ================================== //
-    const notesToShow = showAll ? notes : notes.filter(note => note.important === true)
+const NoteList = ({ notes }) => {
 
     return (
-        <>
-            <h1 className='title'>Notes</h1>
+        <div>
+            <h2 className='title'>Notes</h2>
 
-            {user && (<button className='createNoteBtn' type='button' onClick={() => navigate('/create')}>create note</button>)}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>content</TableCell>
+                            <TableCell>user</TableCell>
+                            <TableCell>important</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {notes.map(note => (
+                            <TableRow key={note.id}>
+                                <TableCell>
+                                    <Link to={`/notes/${note.id}`} >
+                                        {note.content}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>
+                                    {note?.user?.username}
+                                </TableCell>
+                                <TableCell>
+                                    {note.important ? 'yes' : 'no'}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
-            <br />
-
-            <div>
-                <button onClick={() => setShowAll(!showAll)}>
-                    show {showAll ? 'important' : 'all'}
-                </button>
-            </div>
-
-            <ul>
-                {notesToShow.map(note => {
-                    return (
-                        <li key={note.id}>
-                            <Link to={`/notes/${note.id}`}>{note.content} by ~ {note?.user?.username}</Link>
-                        </li>
-                    )
-                })}
-            </ul>
-
-        </>
+        </div>
     )
 }
 

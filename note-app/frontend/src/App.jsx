@@ -2,9 +2,11 @@
 // Imports
 // ===================================== //
 
-// ==== dependecies ==== //
+// ==== dependencies ==== //
 import { useEffect, useState } from 'react'
 import { Routes, Route, Link, useMatch, Navigate, useNavigate } from 'react-router-dom'
+import { Container, AppBar, Toolbar, Button, Typography, Box } from '@mui/material'
+
 
 // ==== Components ==== //
 import Notification from './components/Notification.jsx'
@@ -156,29 +158,53 @@ const App = () => {
   const match = useMatch(`/notes/:id`)
   const note = match ? notes.find(note => note.id === match.params.id) : null
 
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
+
   return (
-    <div>
+    <Container>
 
-      <header className='header'>
+      <AppBar position="static">
 
-        <nav className='navbar'>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }} >
 
-          <Link to='/'>home</Link>
+          <Typography variant='h6' component='div' sx={{ marginInlineEnd: 3, fontWeight: 'bold' }} >
+            Notes App
+          </Typography>
 
-          <Link to='/notes'>notes</Link>
+          <div>
+            <Button color='inherit' component={Link} to='/' sx={style} >home</Button>
 
-          {user && <Link to='/create'>new note</Link>}
+            <Button color='inherit' component={Link} to="/notes" sx={style} >notes</Button>
 
-          {user ?
+            {user &&
+              <Button color='inherit' component={Link} to='/create' sx={style} >new note</Button>
+            }
 
-            <span><strong>{user.name} logged in</strong> <button type='button' onClick={handleLogOut} >logout</button></span>
-            :
-            <Link to='/login'>login</Link>
-          }
+            {user ? (
+              <Button
+                color="inherit"
+                variant="outlined"
+                size="small"
+                onClick={handleLogOut}
+                sx={{ borderColor: 'rgba(255,255,255,0.7)', '&:hover': { borderColor: 'white' } }}
+              >
+                logout
+              </Button>
+            ) :
+              (
+                <Button color="inherit" component={Link} to="/login" sx={style}>
+                  login
+                </Button>
+              )
 
-        </nav>
+            }
 
-      </header>
+          </div>
+
+
+        </Toolbar>
+
+      </AppBar>
 
       <Notification notification={notification} />
 
@@ -216,7 +242,7 @@ const App = () => {
 
       <Footer />
 
-    </div>
+    </Container>
   )
 }
 

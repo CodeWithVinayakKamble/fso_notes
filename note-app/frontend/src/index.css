@@ -1,60 +1,7 @@
-button {
-    font-family: inherit;
-    font-size: inherit;
-    margin-inline-start: 0.5rem;
-    border-radius: 1rem;
-}
-
-.note {
-    color: grey;
-    padding-top: 5px;
-    font-size: 15px;
-}
-
-.notification {
-    background-color: lightgray;
-    font-size: 1.4rem;
-    border: 3px solid;
-    padding: 0.8rem;
-    border-radius: 5px;
-}
-
-.error {
-    color: red;
-    border-color: red;
-}
-
-.success {
-    color: green;
-    border-color: green;
-}
-
 .title {
     color: green;
     font-style: italic;
     font-size: 2.5rem;
 }
 
-.header {
-    display: flex;
-    gap: 1rem;
-    margin-block-end: 0.8rem;
-}
 
-.navbar {
-    display: flex;
-    gap: 0.8rem;
-}
-
-.userLogin {
-    display: flex;
-    gap: 1rem;
-}
-
-.noteContent {
-    display: flex;
-}
-
-.createNoteBtn {
-    margin-inline-end: 0.5rem;
-}

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const NoteForm = ({ createNote }) => {
 
   const [newNote, setNewNote] = useState('')
-  const navigate = useNavigate()
+
 
   const createNewNote = (event) => {
     event.preventDefault()
@@ -14,17 +14,19 @@ const NoteForm = ({ createNote }) => {
       important: Math.random() < 0.5
     })
 
-    
+
     setNewNote('')
   }
 
   return (
     <div>
+
       <h2>create a new note</h2>
 
       <form onSubmit={createNewNote}>
 
-        <input
+        <TextField
+          label='note content'
           type='text'
           value={newNote}
           onChange={({ target }) => setNewNote(target.value)}
@@ -32,9 +34,9 @@ const NoteForm = ({ createNote }) => {
           id='note-input'
           required
         />
-
-        <button type="submit">save</button>
-
+        <div>
+          <Button type="submit" variant='contained' style={{ marginBlockStart: 10 }}>save</Button>
+        </div>
       </form>
 
     </div>
