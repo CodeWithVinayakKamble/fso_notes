@@ -95,6 +95,7 @@ const App = () => {
     try {
       await noteServices.remove(id)
       setNotes(notes.filter(note => note.id !== id))
+      navigate('/notes')
       setNotification({ message: 'Note Deleted', type: 'success' })
       setTimeout(() => { setNotification(null) }, 3000)
 
@@ -166,16 +167,16 @@ const App = () => {
 
           <Link to='/notes'>notes</Link>
 
-          <Link to='/create'>new note</Link>
+          {user && <Link to='/create'>new note</Link>}
+
+          {user ?
+
+            <span><strong>{user.name} logged in</strong> <button type='button' onClick={handleLogOut} >logout</button></span>
+            :
+            <Link to='/login'>login</Link>
+          }
 
         </nav>
-
-        <div>{!user ?
-          (<button type='button' onClick={() => navigate('/login')}>log in</button>)
-          :
-          (<div>{user?.username}<button type='button' onClick={handleLogOut}>log out</button></div>)
-        }
-        </div>
 
       </header>
 
@@ -209,7 +210,7 @@ const App = () => {
 
         <Route path='/create' element={user ? <NoteForm createNote={addNote} /> : <Navigate replace to='/login' />} />
 
-        <Route path='/user' element={<UserRegistration newUser={handleRegistartion} />} />
+        <Route path='/user' element={user ? <Navigate replace to='/notes' /> : <UserRegistration newUser={handleRegistartion} />} />
 
       </Routes>
 

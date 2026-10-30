@@ -16,7 +16,7 @@ const Note = ({ note, activeUser, toggleImportance, deleteNoteHandler }) => {
     const confirmation = window.confirm('Delete Note ?')
     if (confirmation) {
       deleteNoteHandler(id)
-      navigate('/notes')
+
     }
   }
 
