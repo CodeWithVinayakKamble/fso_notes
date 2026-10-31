@@ -31,6 +31,7 @@ mongoose.connect(config.MONGODB_URI)
 // Pre-Route Middlewares
 // ================================== //
 
+app.use(express.static('dist'))
 app.use(cors())                     // Enable Cross-origin resourse sharing
 app.use(express.json())             // It parses incoming raw text (strings) from the network into a JavaScript Object on request.body
 
