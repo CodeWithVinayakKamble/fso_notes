@@ -1,30 +1,24 @@
 import { create } from 'zustand'
+import noteServices from './services/notes'
 
-const initialNotes = [
-    {
-        id: 1,
-        content: 'Zustand is less complex than Redux',
-        important: true,
-    }, {
-        id: 2,
-        content: 'React app benefits from custom hooks',
-        important: false,
-    }, {
-        id: 3,
-        content: 'Remember to sleep well',
-        important: true,
-    }
-]
-
-const useNoteStore = create(set => ({
-    notes: initialNotes,
+const useNoteStore = create((set, get) => ({
+    notes: [],
     filter: 'all',
     actions: {
-        add: note => set(state => ({ notes: [...state.notes, note] })),
-        toggleImportance: id => set(state => ({
-            notes: state.notes.map(note => note.id === id ? { ...note, important: !note.important } : note)
-        })),
-        setFilter: value => set(() => ({ filter: value }))
+        add: async (content) => {
+            const newNote = await noteServices.createNew(content)
+            set(state => ({ notes: [...state.notes, newNote] }))
+        },
+        toggleImportance: async (id) => {
+            const note = get().notes.find(n => n.id === id)
+            const updatedNote = await noteServices.update(id, { ...note, important: !note.important })
+            set(state => ({ notes: state.notes.map(n => n.id === id ? updatedNote : n) }))
+        },
+        setFilter: value => set(() => ({ filter: value })),
+        initalize: async () => {
+            const notes = await noteServices.getAll()
+            set(() => ({ notes }))
+        }
 
     }
 }))

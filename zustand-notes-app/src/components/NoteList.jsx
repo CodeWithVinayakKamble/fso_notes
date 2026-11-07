@@ -1,5 +1,5 @@
 import Note from "./Note";
-import { useFilteredNotes } from "./store";
+import { useFilteredNotes } from "../store";
 
 
 const NoteList = () => {

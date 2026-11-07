@@ -1,15 +1,13 @@
-import { useNoteActions } from "./store"
+import { useNoteActions } from "../store"
+import noteServices from '../services/notes'
 
 const NoteForm = () => {
     const { add } = useNoteActions()
 
-    const generateId = () => Number((Math.random() * 1000000).toFixed(0))
-    const importance = () => (Math.random() < 0.5)
-
-    const addNote = (event) => {
+    const addNote = async (event) => {
         event.preventDefault()
         const content = event.target.note.value
-        add({ id: generateId(), content, important: importance() })
+        await add(content)
         event.target.reset()
     }
 
