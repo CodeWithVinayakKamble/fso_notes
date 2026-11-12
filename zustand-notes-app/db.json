@@ -19,6 +19,16 @@
       "content": "refactored zustand with useFull set get functuon",
       "important": true,
       "id": "L8sj7V4-nCw"
+    },
+    {
+      "content": "FullStackOpen",
+      "important": true,
+      "id": "0BFw7V7-hJA"
+    },
+    {
+      "content": "fs-statemanagement",
+      "important": true,
+      "id": "THVGpWE8Rvk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,9 +1,9 @@
 import Note from "./Note";
-import { useFilteredNotes } from "../store";
+import { useNotes } from "../store";
 
 
 const NoteList = () => {
-    const notes = useFilteredNotes()
+    const notes = useNotes()
     return (
         <ul>
             {

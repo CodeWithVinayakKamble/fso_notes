@@ -1,5 +1,4 @@
 import { useNoteActions } from "../store"
-import noteServices from '../services/notes'
 
 const NoteForm = () => {
     const { add } = useNoteActions()

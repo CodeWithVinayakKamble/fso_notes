@@ -10,11 +10,11 @@ import { useEffect } from "react"
 import { useNoteActions } from "./store"
 
 const App = () => {
-  const { initalize } = useNoteActions()
+  const { initialize } = useNoteActions()
 
   useEffect(() => {
-    initalize()
-  }, [initalize])
+    initialize()
+  }, [initialize])
 
   return (
     <div>

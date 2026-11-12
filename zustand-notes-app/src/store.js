@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import noteServices from './services/notes'
+import { devtools } from 'zustand/middleware'
 
-const useNoteStore = create((set, get) => ({
+const useNoteStore = create(devtools((set, get) => ({
     notes: [],
     filter: 'all',
     actions: {
@@ -15,23 +16,24 @@ const useNoteStore = create((set, get) => ({
             set(state => ({ notes: state.notes.map(n => n.id === id ? updatedNote : n) }))
         },
         setFilter: value => set(() => ({ filter: value })),
-        initalize: async () => {
+        initialize: async () => {
             const notes = await noteServices.getAll()
             set(() => ({ notes }))
         }
 
     }
-}))
+})))
 
 
-export const useNotes = () => useNoteStore(state => state.notes)
-export const useFilter = () => useNoteStore(state => state.filter)
 export const useNoteActions = () => useNoteStore(state => state.actions)
-
-export const useFilteredNotes = () => {
-    const notes = useNotes()
+export const useFilter = () => useNoteStore(state => state.filter)
+export const useNotes = () => {
+    const notes = useNoteStore(state => state.notes)
     const filter = useFilter()
     if (filter === 'important') return notes.filter(note => note.important)
     if (filter === 'nonimportant') return notes.filter(note => !note.important)
     return notes
 }
+
+
+export default useNoteStore
