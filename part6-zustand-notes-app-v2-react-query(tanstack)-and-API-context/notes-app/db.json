@@ -1,0 +1,30 @@
+{
+  "notes": [
+    {
+      "id": "1",
+      "content": "tanstack query simplifies the communication with backend",
+      "important": false
+    },
+    {
+      "id": "2",
+      "content": "context api provides an alternative way for sharing data between components",
+      "important": false
+    },
+    {
+      "content": "FullStackOpen",
+      "important": false,
+      "id": "9RRuJgnJS70"
+    },
+    {
+      "content": "fs-statemanagement",
+      "important": false,
+      "id": "fFwvPCVrWp4"
+    },
+    {
+      "content": "FullStackOpen",
+      "important": false,
+      "id": "pI0cCUWuu_U"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
