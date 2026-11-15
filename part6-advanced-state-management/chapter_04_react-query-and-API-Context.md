@@ -60,3 +60,25 @@
 - **For small client UI state, installing Redux or Zustand is often overkill! React has its own built-in tool: Context API (often paired with useReducer)**.
 
 - It lets you pass global UI state anywhere in your component tree without props drilling, with zero external npm libraries.
+
+## Complete mental model of React state Management
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. LOCAL STATE (Only ONE component cares)                   │
+│    👉 Use: useState                                           
+│    • Is this dropdown menu open or closed? (isOpen)         │
+│    • What is the user typing in this input right now?       │
+│    • Is this tab selected?                                  │
+├─────────────────────────────────────────────────────────────┤
+│ 2. GLOBAL CLIENT STATE (Multiple distant components care)   │
+│    👉 Use: Context API or Zustand                          │
+│    • Dark Mode / Light Mode theme                           │
+│    • Global notification toast banner                       │
+│    • Logged-in user's token / language preference           │
+├─────────────────────────────────────────────────────────────┤
+│ 3. SERVER STATE (Remote database data)                      │
+│    👉 Use: TanStack Query                                   │
+│    • List of notes, products, anecdotes                     │
+│    • User profile fetched from /api/user                    │
+└─────────────────────────────────────────────────────────────┘
+```
